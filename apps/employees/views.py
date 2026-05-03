@@ -11,6 +11,7 @@ import datetime
 from .models import Employe, Conge, Presence, BulletinPaie
 from .forms import EmployeForm, CongeForm, PresenceForm
 from .utils import calculer_bulletin, generer_pdf_bulletin
+from apps.audit.utils import log_action
 
 class EmployeListView(GroupRequiredMixin, ListView):
     required_groups = ['admin', 'dg', 'rh', 'chef_projet', 'comptable']
@@ -39,7 +40,17 @@ class EmployeCreateView(GroupRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.created_by = self.request.user
         messages.success(self.request, "Employé créé avec succès.")
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        log_action(
+            user=self.request.user,
+            action='CREATE',
+            module='rh',
+            object_type='Employe',
+            object_id=self.object.pk,
+            object_repr=str(self.object),
+            request=self.request
+        )
+        return response
 
 class EmployeUpdateView(LoginRequiredMixin, UpdateView):
     model = Employe
@@ -51,7 +62,17 @@ class EmployeUpdateView(LoginRequiredMixin, UpdateView):
         
     def form_valid(self, form):
         messages.success(self.request, "Employé mis à jour avec succès.")
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        log_action(
+            user=self.request.user,
+            action='UPDATE',
+            module='rh',
+            object_type='Employe',
+            object_id=self.object.pk,
+            object_repr=str(self.object),
+            request=self.request
+        )
+        return response
 
 class EmployeDeleteView(LoginRequiredMixin, DeleteView):
     model = Employe
@@ -61,6 +82,17 @@ class EmployeDeleteView(LoginRequiredMixin, DeleteView):
         self.object = self.get_object()
         self.object.is_active = False
         self.object.save()
+        log_action(
+            user=self.request.user,
+            action='DELETE',
+            module='rh',
+            object_type='Employe',
+            object_id=self.object.pk,
+            object_repr=str(self.object),
+            request=self.request,
+            status='success',
+            risk_level='medium'
+        )
         messages.success(self.request, "Employé supprimé (archivé).")
         return redirect(self.success_url)
 

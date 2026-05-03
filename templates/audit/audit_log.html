@@ -50,7 +50,9 @@
                     <option value="admin" {% if request.GET.module == 'admin' %}selected{% endif %}>Administration</option>
                     <option value="rh" {% if request.GET.module == 'rh' %}selected{% endif %}>RH</option>
                     <option value="comptable" {% if request.GET.module == 'comptable' %}selected{% endif %}>Comptabilité</option>
-                    <option value="chef_projet" {% if request.GET.module == 'chef_projet' %}selected{% endif %}>Opérations</option>
+                    <option value="chef_projet" {% if request.GET.module == 'chef_projet' %}selected{% endif %}>Projets/Opérations</option>
+                    <option value="achats" {% if request.GET.module == 'achats' %}selected{% endif %}>Achats</option>
+                    <option value="parc" {% if request.GET.module == 'parc' %}selected{% endif %}>Parc Engins</option>
                 </select>
             </div>
             <div class="col-md-2 d-flex align-items-end">

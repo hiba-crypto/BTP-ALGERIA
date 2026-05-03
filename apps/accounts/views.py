@@ -9,6 +9,7 @@ from django.contrib import messages
 from .forms import LoginForm, TwoFactorForm, CustomPasswordChangeForm, UserCreateForm, UserUpdateForm
 from .models import UserProfile, Role
 from apps.audit.models import AuditLog
+from apps.audit.utils import log_action
 from axes.utils import reset
 from django.db.models import Q
 from django.contrib.auth.mixins import UserPassesTestMixin
@@ -200,8 +201,17 @@ class UserManagementView(AdminRequiredMixin, TemplateView):
     def post(self, request, *args, **kwargs):
         form = UserCreateForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save()
             messages.success(request, "Utilisateur créé avec succès.")
+            log_action(
+                user=request.user,
+                action='CREATE',
+                module='admin',
+                object_type='User',
+                object_id=user.pk,
+                object_repr=user.username,
+                request=request
+            )
             return redirect('user_management')
         
         context = self.get_context_data(**kwargs)
@@ -217,7 +227,17 @@ class UserUpdateView(AdminRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         messages.success(self.request, "Utilisateur mis à jour.")
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        log_action(
+            user=self.request.user,
+            action='UPDATE',
+            module='admin',
+            object_type='User',
+            object_id=self.object.pk,
+            object_repr=self.object.username,
+            request=self.request
+        )
+        return response
 
 class UserDeleteView(AdminRequiredMixin, View):
     def post(self, request, user_id):
@@ -225,6 +245,18 @@ class UserDeleteView(AdminRequiredMixin, View):
         if user == request.user:
             messages.error(request, "Vous ne pouvez pas supprimer votre propre compte.")
         else:
+            username = user.username
+            user_pk = user.pk
             user.delete()
+            log_action(
+                user=request.user,
+                action='DELETE',
+                module='admin',
+                object_type='User',
+                object_id=user_pk,
+                object_repr=username,
+                request=request,
+                risk_level='high'
+            )
             messages.success(request, "Utilisateur supprimé.")
         return redirect('user_management')

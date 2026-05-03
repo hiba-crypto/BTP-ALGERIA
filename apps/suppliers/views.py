@@ -5,6 +5,7 @@ from django.db.models import Q
 from .models import Fournisseur, DemandeAchat, DevisComparaison, BonCommande, LigneBonCommande, BonReception, FactureFournisseur
 from .forms import FournisseurForm, DemandeAchatForm, BonCommandeForm, BonReceptionForm, FactureFournisseurForm, DevisComparaisonForm
 from .utils import generer_pdf_bon_commande, verifier_seuil_approbation
+from apps.audit.utils import log_action
 from django.utils import timezone
 
 # --- Fournisseurs ---
@@ -59,6 +60,16 @@ def fournisseur_delete(request, pk):
     fournisseur = get_object_or_404(Fournisseur, pk=pk)
     fournisseur.is_active = False
     fournisseur.save()
+    log_action(
+        user=request.user,
+        action='DELETE',
+        module='achats',
+        object_type='Fournisseur',
+        object_id=fournisseur.pk,
+        object_repr=fournisseur.raison_sociale,
+        request=request,
+        risk_level='medium'
+    )
     messages.warning(request, "Fournisseur archivé.")
     return redirect('fournisseur_list')
 
@@ -70,6 +81,7 @@ def demande_achat_list(request):
 
 @login_required
 def demande_achat_create(request):
+    projet_id = request.GET.get('projet')
     if request.method == 'POST':
         form = DemandeAchatForm(request.POST)
         if form.is_valid():
@@ -77,9 +89,24 @@ def demande_achat_create(request):
             demande.demandeur = request.user
             demande.save()
             messages.success(request, "Demande d'achat créée.")
+            log_action(
+                user=request.user,
+                action='CREATE',
+                module='achats',
+                object_type='DemandeAchat',
+                object_id=demande.pk,
+                object_repr=str(demande),
+                request=request
+            )
+            if demande.projet:
+                return redirect('projet_detail', pk=demande.projet.pk)
             return redirect('demande_achat_list')
     else:
-        form = DemandeAchatForm()
+        initial = {}
+        if projet_id:
+            from apps.projects.models import Projet
+            initial['projet'] = get_object_or_404(Projet, pk=projet_id)
+        form = DemandeAchatForm(initial=initial)
     return render(request, 'suppliers/demande_achat_form.html', {'form': form})
 
 @login_required

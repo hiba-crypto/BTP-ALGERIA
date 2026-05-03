@@ -8,4 +8,5 @@ urlpatterns = [
     path('<int:pk>/modifier/', views.ProjetUpdateView.as_view(), name='projet_update'),
     path('<int:projet_id>/situation/nouvelle/', views.SituationTravauxCreateView.as_view(), name='situation_create'),
     path('<int:pk>/rentabilite/', views.RentabiliteView.as_view(), name='projet_rentabilite'),
+    path('<int:pk>/supprimer/', views.ProjetDeleteView.as_view(), name='projet_delete'),
 ]

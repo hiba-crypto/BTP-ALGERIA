@@ -7,6 +7,7 @@ urlpatterns = [
     path('engins/add/', views.EnginCreateView.as_view(), name='engin_add'),
     path('engins/<int:pk>/', views.EnginDetailView.as_view(), name='engin_detail'),
     path('engins/<int:pk>/edit/', views.EnginUpdateView.as_view(), name='engin_edit'),
+    path('engins/<int:pk>/delete/', views.EnginDeleteView.as_view(), name='engin_delete'),
     
     path('maintenance/', views.MaintenanceListView.as_view(), name='maintenance_list'),
     path('maintenance/add/', views.MaintenanceCreateView.as_view(), name='maintenance_add'),

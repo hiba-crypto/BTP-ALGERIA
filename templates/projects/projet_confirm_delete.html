@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Supprimer Projet - BTP Algeria{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow border-0">
+                <div class="card-header bg-danger text-white py-3">
+                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Confirmation de suppression</h5>
+                </div>
+                <div class="card-body p-4 text-center">
+                    <p class="fs-5">Êtes-vous sûr de vouloir supprimer définitivement le projet :</p>
+                    <h3 class="text-primary mb-4">{{ object.reference }} - {{ object.intitule }}</h3>
+                    <div class="alert alert-warning small text-start">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Attention : Cette action est irréversible et supprimera également toutes les situations de travaux et les données de rentabilité associées.
+                    </div>
+                    <form method="post" class="mt-4">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger">Oui, supprimer définitivement</button>
+                            <a href="{% url 'projet_detail' object.pk %}" class="btn btn-outline-secondary">Annuler et revenir en arrière</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

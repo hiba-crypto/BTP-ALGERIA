@@ -1,4 +1,4 @@
-from django.views.generic import ListView, DetailView, CreateView, UpdateView, TemplateView
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
 from django.views import View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
@@ -9,6 +9,7 @@ from .utils import generer_alertes_flotte
 from django.db.models import Sum
 from django.shortcuts import redirect
 import datetime
+from apps.audit.utils import log_action
 
 class FleetDashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'fleet/fleet_dashboard.html'
@@ -52,15 +53,59 @@ class EnginCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.created_by = self.request.user
         messages.success(self.request, "Engin ajouté avec succès.")
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        log_action(
+            user=self.request.user,
+            action='CREATE',
+            module='parc',
+            object_type='Engin',
+            object_id=self.object.pk,
+            object_repr=str(self.object),
+            request=self.request
+        )
+        return response
 
 class EnginUpdateView(LoginRequiredMixin, UpdateView):
     model = Engin
     fields = ['designation', 'type_engin', 'marque', 'modele', 'numero_serie', 'immatriculation', 'etat', 'compteur_heures', 'compteur_km']
     template_name = 'fleet/engin_form.html'
+
+    def form_valid(self, form):
+        messages.success(self.request, "Engin mis à jour avec succès.")
+        response = super().form_valid(form)
+        log_action(
+            user=self.request.user,
+            action='UPDATE',
+            module='parc',
+            object_type='Engin',
+            object_id=self.object.pk,
+            object_repr=str(self.object),
+            request=self.request
+        )
+        return response
     
     def get_success_url(self):
         return reverse_lazy('engin_detail', kwargs={'pk': self.object.pk})
+
+class EnginDeleteView(LoginRequiredMixin, DeleteView):
+    model = Engin
+    template_name = 'fleet/engin_confirm_delete.html'
+    success_url = reverse_lazy('engin_list')
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        log_action(
+            user=self.request.user,
+            action='DELETE',
+            module='parc',
+            object_type='Engin',
+            object_id=self.object.pk,
+            object_repr=str(self.object),
+            request=self.request,
+            risk_level='medium'
+        )
+        messages.success(request, "Engin supprimé avec succès.")
+        return super().delete(request, *args, **kwargs)
 
 class MaintenanceCreateView(LoginRequiredMixin, CreateView):
     model = Maintenance

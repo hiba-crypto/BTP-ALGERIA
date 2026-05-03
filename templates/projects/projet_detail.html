@@ -34,9 +34,21 @@
                 </div>
                 <hr>
                 <div class="d-grid gap-2">
-                    <a href="{% url 'projet_update' projet.id %}" class="btn btn-outline-primary btn-sm">Modifier le projet</a>
-                    <a href="{% url 'situation_create' projet.id %}" class="btn btn-success btn-sm">Saisir Situation</a>
-                    <a href="{% url 'projet_rentabilite' projet.id %}" class="btn btn-warning btn-sm text-dark">Rentabilité détaillée</a>
+                    <a href="{% url 'demande_achat_create' %}?projet={{ projet.id }}" class="btn btn-primary btn-sm">
+                        <i class="fas fa-shopping-cart me-1"></i>Nouvelle Demande d'Achat
+                    </a>
+                    <a href="{% url 'projet_update' projet.id %}" class="btn btn-outline-primary btn-sm">
+                        <i class="fas fa-edit me-1"></i>Modifier le projet
+                    </a>
+                    <a href="{% url 'situation_create' projet.id %}" class="btn btn-success btn-sm">
+                        <i class="fas fa-file-invoice-dollar me-1"></i>Saisir Situation
+                    </a>
+                    <a href="{% url 'projet_rentabilite' projet.id %}" class="btn btn-warning btn-sm text-dark">
+                        <i class="fas fa-chart-pie me-1"></i>Rentabilité détaillée
+                    </a>
+                    <a href="{% url 'projet_delete' projet.id %}" class="btn btn-danger btn-sm">
+                        <i class="fas fa-trash me-1"></i>Supprimer le projet
+                    </a>
                 </div>
             </div>
         </div>
@@ -156,6 +168,33 @@
                     </div>
                     
                     <div class="tab-pane fade" id="achats">
+                        <h6 class="fw-bold mb-3">Demandes d'Achat (DA)</h6>
+                        <table class="table table-sm table-hover mb-4">
+                            <thead>
+                                <tr>
+                                    <th>Référence</th>
+                                    <th>Date</th>
+                                    <th>Objet</th>
+                                    <th>Montant Est.</th>
+                                    <th>Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for da in demandes_achat %}
+                                <tr>
+                                    <td><span class="fw-bold">{{ da.reference }}</span></td>
+                                    <td>{{ da.created_at|date:"d/m/Y" }}</td>
+                                    <td>{{ da.objet|truncatechars:50 }}</td>
+                                    <td>{{ da.montant_estime_dzd }} DZD</td>
+                                    <td><span class="badge bg-secondary">{{ da.get_statut_display }}</span></td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="5" class="text-center py-2 text-muted">Aucune demande d'achat pour ce projet.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+
+                        <h6 class="fw-bold mb-3">Bons de Commande (BC)</h6>
                         <table class="table table-sm table-hover">
                             <thead>
                                 <tr>
@@ -176,7 +215,7 @@
                                     <td><span class="badge bg-info">{{ achat.get_statut_display }}</span></td>
                                 </tr>
                                 {% empty %}
-                                <tr><td colspan="5" class="text-center py-3 text-muted">Aucun achat effectué pour ce projet.</td></tr>
+                                <tr><td colspan="5" class="text-center py-2 text-muted">Aucun bon de commande pour ce projet.</td></tr>
                                 {% endfor %}
                             </tbody>
                         </table>

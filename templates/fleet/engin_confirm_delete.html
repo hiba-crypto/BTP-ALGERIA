@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Supprimer Engin - BTP Algeria{% endblock %}
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow border-0">
+                <div class="card-header bg-danger text-white py-3">
+                    <h5 class="mb-0"><i class="fas fa-trash-alt me-2"></i>Supprimer du parc</h5>
+                </div>
+                <div class="card-body p-4 text-center">
+                    <p class="fs-5">Voulez-vous retirer cet engin du parc actif ?</p>
+                    <h3 class="text-primary mb-4">{{ object.code }} - {{ object.designation }}</h3>
+                    <div class="alert alert-info small text-start">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Note : Toutes les données historiques de maintenance et de carburant seront conservées.
+                    </div>
+                    <form method="post" class="mt-4">
+                        {% csrf_token %}
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger">Supprimer l'engin</button>
+                            <a href="{% url 'engin_list' %}" class="btn btn-outline-secondary">Annuler</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
