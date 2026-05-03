@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block title %}Tableau de Bord Flotte - BTP Algeria{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <h1 class="h3 mb-4 text-gray-800">Tableau de Bord - Parc Engins</h1>
+
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2 border-0 border-start border-4 border-primary">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Engins</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_engins }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-truck-monster fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2 border-0 border-start border-4 border-success">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Disponibles (En Service)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ en_service }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-check-circle fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2 border-0 border-start border-4 border-warning">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Coût Maintenance (Cumulé)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ cout_maintenance|floatformat:2 }} DZD</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-tools fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2 border-0 border-start border-4 border-info">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Consommation Carburant</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ cout_carburant|floatformat:2 }} DZD</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-gas-pump fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Alertes Critiques (Échéances < 30j)</h6>
+                </div>
+                <div class="card-body">
+                    {% if alertes.ct or alertes.assurance %}
+                        <ul class="list-group list-group-flush">
+                            {% for e in alertes.ct %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="badge bg-danger me-2">CT</span>
+                                    <strong>{{ e.code }}</strong> - {{ e.designation }}
+                                </div>
+                                <span class="text-danger font-weight-bold">{{ e.prochain_ct_date|date:"d/m/Y" }}</span>
+                            </li>
+                            {% endfor %}
+                            {% for e in alertes.assurance %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="badge bg-warning text-dark me-2">Assurance</span>
+                                    <strong>{{ e.code }}</strong> - {{ e.designation }}
+                                </div>
+                                <span class="text-warning font-weight-bold">{{ e.expiration_assurance|date:"d/m/Y" }}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-center text-muted py-4">Aucune alerte critique.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Maintenances en Cours</h6>
+                </div>
+                <div class="card-body">
+                    {% if alertes.maintenance %}
+                        {% for m in alertes.maintenance %}
+                        <div class="mb-3 border-bottom pb-2">
+                            <p class="mb-1 font-weight-bold text-dark">{{ m.engin.code }}</p>
+                            <small class="text-muted">{{ m.get_type_maintenance_display }} depuis le {{ m.date_entree|date:"d/m/Y" }}</small>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-center text-muted small">Aucune maintenance en cours.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

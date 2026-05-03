@@ -1,0 +1,23 @@
+[
+  {"model": "finance.comptecomptable", "pk": 1, "fields": {"numero": "101000", "intitule": "Capital social", "classe": 1, "type_compte": "passif"}},
+  {"model": "finance.comptecomptable", "pk": 2, "fields": {"numero": "164000", "intitule": "Emprunts bancaires", "classe": 1, "type_compte": "passif"}},
+  {"model": "finance.comptecomptable", "pk": 3, "fields": {"numero": "211000", "intitule": "Terrains", "classe": 2, "type_compte": "actif"}},
+  {"model": "finance.comptecomptable", "pk": 4, "fields": {"numero": "213000", "intitule": "Constructions", "classe": 2, "type_compte": "actif"}},
+  {"model": "finance.comptecomptable", "pk": 5, "fields": {"numero": "215000", "intitule": "Matériels et outillages", "classe": 2, "type_compte": "actif"}},
+  {"model": "finance.comptecomptable", "pk": 6, "fields": {"numero": "218000", "intitule": "Autres immobilisations corporelles (engins)", "classe": 2, "type_compte": "actif"}},
+  {"model": "finance.comptecomptable", "pk": 7, "fields": {"numero": "281500", "intitule": "Amortissements matériels", "classe": 2, "type_compte": "passif"}},
+  {"model": "finance.comptecomptable", "pk": 8, "fields": {"numero": "310000", "intitule": "Stocks matières premières", "classe": 3, "type_compte": "actif"}},
+  {"model": "finance.comptecomptable", "pk": 9, "fields": {"numero": "332000", "intitule": "En-cours de production (travaux)", "classe": 3, "type_compte": "actif"}},
+  {"model": "finance.comptecomptable", "pk": 10, "fields": {"numero": "400000", "intitule": "Fournisseurs", "classe": 4, "type_compte": "passif"}},
+  {"model": "finance.comptecomptable", "pk": 11, "fields": {"numero": "410000", "intitule": "Clients (maîtres d'ouvrage)", "classe": 4, "type_compte": "actif"}},
+  {"model": "finance.comptecomptable", "pk": 12, "fields": {"numero": "421000", "intitule": "Personnel - rémunérations dues", "classe": 4, "type_compte": "passif"}},
+  {"model": "finance.comptecomptable", "pk": 13, "fields": {"numero": "431000", "intitule": "Sécurité sociale (CNAS)", "classe": 4, "type_compte": "passif"}},
+  {"model": "finance.comptecomptable", "pk": 14, "fields": {"numero": "445000", "intitule": "Etat - TVA collectée", "classe": 4, "type_compte": "passif"}},
+  {"model": "finance.comptecomptable", "pk": 15, "fields": {"numero": "445600", "intitule": "Etat - TVA déductible", "classe": 4, "type_compte": "actif"}},
+  {"model": "finance.comptecomptable", "pk": 16, "fields": {"numero": "512100", "intitule": "Banque CPA", "classe": 5, "type_compte": "actif"}},
+  {"model": "finance.comptecomptable", "pk": 17, "fields": {"numero": "530000", "intitule": "Caisse DZD", "classe": 5, "type_compte": "actif"}},
+  {"model": "finance.comptecomptable", "pk": 18, "fields": {"numero": "601000", "intitule": "Achats matières premières", "classe": 6, "type_compte": "charge"}},
+  {"model": "finance.comptecomptable", "pk": 19, "fields": {"numero": "631000", "intitule": "Impôts et taxes (TAP)", "classe": 6, "type_compte": "charge"}},
+  {"model": "finance.comptecomptable", "pk": 20, "fields": {"numero": "641000", "intitule": "Rémunérations du personnel", "classe": 6, "type_compte": "charge"}},
+  {"model": "finance.comptecomptable", "pk": 21, "fields": {"numero": "704000", "intitule": "Travaux (situations de travaux)", "classe": 7, "type_compte": "produit"}}
+]

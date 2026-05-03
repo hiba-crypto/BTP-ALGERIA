@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load l10n %}
+
+{% block title %}Dashboard Projets - BTP Algeria{% endblock %}
+
+{% block content %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Suivi des Projets & Chantiers</h1>
+</div>
+
+<div class="row">
+    <div class="col-xl-3 col-md-6 mb-4">
+        {% include 'components/kpi_card.html' with label="Projets en cours" value=projets.count icon="fas fa-hard-hat" color="primary" %}
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        {% include 'components/kpi_card.html' with label="Avancement Moyen" value="68%" icon="fas fa-tasks" color="info" %}
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        {% include 'components/kpi_card.html' with label="Jours Retard Cumulés" value="45" icon="fas fa-clock" color="danger" %}
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        {% include 'components/kpi_card.html' with label="Marge Moyenne" value="18.5%" icon="fas fa-chart-line" color="success" %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow mb-4 border-0">
+            <div class="card-header py-3 bg-white d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">Avancement par Projet (%)</h6>
+                <a href="{% url 'projet_list' %}" class="btn btn-sm btn-outline-primary">Liste détaillée</a>
+            </div>
+            <div class="card-body">
+                {% for p in projets %}
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span class="small font-weight-bold text-dark">{{ p.reference }} - {{ p.intitule|truncatechars:50 }}</span>
+                        <span class="small font-weight-bold">{{ p.avancement_pct }}%</span>
+                    </div>
+                    <div class="progress" style="height: 12px;">
+                        <div class="progress-bar {% if p.avancement_pct < 40 %}bg-danger{% elif p.avancement_pct < 80 %}bg-warning{% else %}bg-success{% endif %}" 
+                             role="progressbar" style="width: {{ p.avancement_pct|unlocalize }}%"></div>
+                    </div>
+                    <div class="mt-1 d-flex justify-content-between small text-muted">
+                        <span><i class="fas fa-calendar-alt me-1"></i>Fin contractuelle: {{ p.date_fin_contractuelle|date:"d/m/Y" }}</span>
+                        <span><i class="fas fa-user me-1"></i>{{ p.chef_projet|default:"N/A" }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card shadow mb-4 border-0">
+            <div class="card-header py-3 bg-white">
+                <h6 class="m-0 font-weight-bold text-primary">Rentabilité par Projet</h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Projet</th>
+                                <th>CA Réalisé</th>
+                                <th>Marge Brute %</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in projets %}
+                            <tr>
+                                <td class="fw-bold">{{ p.reference }}</td>
+                                <td>{{ p.rentabilite.ca_realise_dzd|floatformat:2 }} DZD</td>
+                                <td>
+                                    <span class="{% if p.rentabilite.marge_brute_pct < 10 %}text-danger{% else %}text-success{% endif %} fw-bold">
+                                        {{ p.rentabilite.marge_brute_pct }}%
+                                    </span>
+                                </td>
+                                <td><span class="badge bg-primary">{{ p.get_statut_display }}</span></td>
+                                <td><a href="{% url 'projet_detail' p.id %}" class="btn btn-sm btn-outline-info">Détails</a></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

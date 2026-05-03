@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Situation de Travaux - BTP Algeria{% endblock %}
+{% block page_title %}Situation de Travaux{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 text-primary"><i class="fas fa-file-invoice me-2"></i>Saisie d'une situation</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info small">
+                    Les retenues de garantie (5%) et la TVA sont calculées automatiquement lors de la soumission.
+                </div>
+                <form method="post">
+                    {% csrf_token %}
+                    {% crispy form %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

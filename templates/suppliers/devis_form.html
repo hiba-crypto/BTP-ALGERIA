@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Enregistrer un Devis - BTP Algeria{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'demande_achat_list' %}">Demandes d'Achat</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'devis_comparaison' demande.id %}">Comparaison</a></li>
+            <li class="breadcrumb-item active">Nouveau Devis</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-file-invoice-dollar me-2"></i>Saisie d'un Devis Fournisseur
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info small">
+                        <strong>Référence DA :</strong> {{ demande.reference }}<br>
+                        <strong>Objet :</strong> {{ demande.objet }}
+                    </div>
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a href="{% url 'devis_comparaison' demande.id %}" class="btn btn-secondary">Annuler</a>
+                            <button type="submit" class="btn btn-primary">Enregistrer le Devis</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

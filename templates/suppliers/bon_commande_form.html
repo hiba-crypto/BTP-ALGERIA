@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Bon de Commande - BTP Algeria{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white py-3">
+                    <h5 class="mb-0">Édition du Bon de Commande</h5>
+                </div>
+                <div class="card-body">
+                    {% if demande %}
+                    <div class="alert alert-info small">
+                        Génération basée sur la demande <strong>{{ demande.reference }}</strong>
+                    </div>
+                    {% endif %}
+                    
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form.fournisseur|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.projet|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.date_livraison_prevue|as_crispy_field }}
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                {{ form.montant_ht_dzd|as_crispy_field }}
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                {{ form.taux_tva|as_crispy_field }}
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                {{ form.conditions_paiement|as_crispy_field }}
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                {{ form.lieu_livraison|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div id="seuil-warning" class="alert alert-warning d-none">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Attention :</strong> Ce montant dépasse 8,000,000 DZD et nécessitera l'approbation du Directeur Général.
+                        </div>
+
+                        <div class="mt-4 d-flex justify-content-between">
+                            <a href="{% url 'bon_commande_list' %}" class="btn btn-outline-secondary">Annuler</a>
+                            <button type="submit" class="btn btn-dark">Créer le Bon de Commande</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('id_montant_ht_dzd').addEventListener('input', function() {
+        const montant = parseFloat(this.value) || 0;
+        const tva = parseFloat(document.getElementById('id_taux_tva').value) || 19;
+        const ttc = montant * (1 + tva/100);
+        const warning = document.getElementById('seuil-warning');
+        
+        if (ttc > 8000000) {
+            warning.classList.remove('d-none');
+        } else {
+            warning.classList.add('d-none');
+        }
+    });
+</script>
+{% endblock %}

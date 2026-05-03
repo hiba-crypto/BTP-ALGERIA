@@ -1,0 +1,17 @@
+[Unit]
+Description=gunicorn daemon for BTP Algeria
+After=network.target
+
+[Service]
+User=btp
+Group=www-data
+WorkingDirectory=/home/btp/app
+ExecStart=/home/btp/venv/bin/gunicorn \
+          --access-logfile - \
+          --workers 5 \
+          --bind unix:/run/gunicorn.sock \
+          --timeout 120 \
+          config.wsgi:application
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Comptes Bancaires - BTP Algeria{% endblock %}
+{% block page_title %}Comptes Bancaires & Caisses{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Comptes Bancaires & Caisses</h1>
+    <a href="{% url 'compte_bancaire_add' %}" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i> Nouveau Compte</a>
+</div>
+<div class="row">
+    {% for compte in comptes %}
+    <div class="col-md-6 mb-4">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 text-primary fw-bold"><i class="fas fa-university me-2"></i>{{ compte.get_banque_display }}</h5>
+                <div>
+                    {% if compte.is_active %}<span class="badge bg-success me-2">Actif</span>{% else %}<span class="badge bg-secondary me-2">Inactif</span>{% endif %}
+                    <a href="{% url 'compte_bancaire_edit' compte.pk %}" class="btn btn-sm btn-outline-secondary" title="Modifier"><i class="fas fa-edit"></i></a>
+                </div>
+            </div>
+            <div class="card-body bg-light">
+                <h6 class="text-muted mb-1">Intitulé</h6>
+                <p class="fw-bold fs-5 mb-3">{{ compte.intitule }}</p>
+                
+                <div class="row mb-3">
+                    <div class="col-6">
+                        <small class="text-muted d-block">Numéro de Compte</small>
+                        <span class="font-monospace">{{ compte.numero_compte }}</span>
+                    </div>
+                    <div class="col-6">
+                        <small class="text-muted d-block">RIB</small>
+                        <span class="font-monospace">{{ compte.rib }}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer bg-primary text-white d-flex justify-content-between align-items-center">
+                <span class="text-uppercase small fw-bold">Solde Actuel</span>
+                <span class="fs-4 fw-bold">{{ compte.solde_dzd }} {{ compte.devise }}</span>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12 text-center text-muted py-5">
+        <i class="fas fa-piggy-bank fa-3x mb-3 text-light"></i>
+        <h5>Aucun compte bancaire configuré</h5>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

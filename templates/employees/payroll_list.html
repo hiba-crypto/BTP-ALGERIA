@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Paie - BTP Algeria{% endblock %}
+{% block page_title %}Bulletins de Paie{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 text-primary"><i class="fas fa-money-check-alt me-2"></i>Traitement de la Paie</h5>
+        <form action="{% url 'payroll_generate' %}" method="post" class="d-flex align-items-center">
+            {% csrf_token %}
+            <input type="number" name="mois" class="form-control form-control-sm me-2" placeholder="Mois (1-12)" min="1" max="12" required style="width: 100px;">
+            <input type="number" name="annee" class="form-control form-control-sm me-2" placeholder="Année" value="2024" required style="width: 100px;">
+            <button type="submit" class="btn btn-primary btn-sm"><i class="fas fa-cogs me-1"></i> Générer Bulletins</button>
+        </form>
+    </div>
+    <div class="card-body p-0">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th class="ps-3">Période</th>
+                    <th>Employé</th>
+                    <th>Salaire Brut</th>
+                    <th>Retenues (CNAS+IRG)</th>
+                    <th>Net à Payer</th>
+                    <th>Statut</th>
+                    <th>PDF</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for b in bulletins %}
+                <tr>
+                    <td class="ps-3 fw-bold">{{ b.mois }}/{{ b.annee }}</td>
+                    <td>{{ b.employe.nom }} {{ b.employe.prenom }}</td>
+                    <td>{{ b.salaire_brut }} DZD</td>
+                    <td class="text-danger">-{{ b.cnas_salariale|add:b.irg }} DZD</td>
+                    <td class="fw-bold text-success">{{ b.salaire_net }} DZD</td>
+                    <td><span class="badge bg-secondary">{{ b.get_statut_display }}</span></td>
+                    <td>
+                        <a href="{% url 'payroll_download' b.id %}" class="btn btn-sm btn-outline-danger"><i class="fas fa-file-pdf"></i></a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="text-center py-4 text-muted">Aucun bulletin généré.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

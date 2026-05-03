@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+
+{% block title %}Journal d'Audit - BTP Algeria{% endblock %}
+{% block page_title %}Journal d'Audit et de Sécurité{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white py-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0 text-primary"><i class="fas fa-list-alt me-2"></i>Historique des actions</h5>
+            <a href="{% url 'export_audit_logs' %}" class="btn btn-sm btn-outline-success">
+                <i class="fas fa-file-excel me-1"></i> Exporter Excel
+            </a>
+        </div>
+    </div>
+    <div class="card-body bg-light border-bottom">
+        <form method="get" class="row g-3">
+            <div class="col-md-2">
+                <label class="form-label small text-muted">Date début</label>
+                <input type="date" name="date_from" class="form-control form-control-sm" value="{{ request.GET.date_from }}">
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-muted">Date fin</label>
+                <input type="date" name="date_to" class="form-control form-control-sm" value="{{ request.GET.date_to }}">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small text-muted">Action</label>
+                <select name="action" class="form-select form-select-sm">
+                    <option value="">Toutes les actions</option>
+                    <option value="LOGIN_SUCCESS" {% if request.GET.action == 'LOGIN_SUCCESS' %}selected{% endif %}>Connexion réussie</option>
+                    <option value="LOGIN_FAIL" {% if request.GET.action == 'LOGIN_FAIL' %}selected{% endif %}>Échec de connexion</option>
+                    <option value="CREATE" {% if request.GET.action == 'CREATE' %}selected{% endif %}>Création</option>
+                    <option value="UPDATE" {% if request.GET.action == 'UPDATE' %}selected{% endif %}>Modification</option>
+                    <option value="DELETE" {% if request.GET.action == 'DELETE' %}selected{% endif %}>Suppression</option>
+                    <option value="EXPORT" {% if request.GET.action == 'EXPORT' %}selected{% endif %}>Exportation</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label small text-muted">Module</label>
+                <select name="module" class="form-select form-select-sm">
+                    <option value="">Tous les modules</option>
+                    <option value="accounts" {% if request.GET.module == 'accounts' %}selected{% endif %}>Comptes/Auth</option>
+                    <option value="employees" {% if request.GET.module == 'employees' %}selected{% endif %}>Employés/RH</option>
+                    <option value="finance" {% if request.GET.module == 'finance' %}selected{% endif %}>Finance</option>
+                    <option value="projects" {% if request.GET.module == 'projects' %}selected{% endif %}>Projets</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary btn-sm w-100"><i class="fas fa-filter me-1"></i> Filtrer</button>
+            </div>
+        </form>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped align-middle mb-0" style="font-size: 0.9rem;">
+                <thead class="table-dark">
+                    <tr>
+                        <th class="ps-3">Date & Heure</th>
+                        <th>Utilisateur</th>
+                        <th>IP</th>
+                        <th>Action</th>
+                        <th>Module / Objet</th>
+                        <th>Détail (Aperçu)</th>
+                        <th>Risque</th>
+                        <th>Statut</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr>
+                        <td class="ps-3 text-nowrap">{{ log.timestamp|date:"d/m/Y H:i:s" }}</td>
+                        <td class="fw-bold">{{ log.username_snapshot }}</td>
+                        <td><span class="badge bg-light text-dark font-monospace">{{ log.ip_address|default:"-" }}</span></td>
+                        <td>
+                            {% if 'FAIL' in log.action or 'DELETE' in log.action %}
+                                <span class="badge bg-danger">{{ log.get_action_display }}</span>
+                            {% elif 'SUCCESS' in log.action or 'CREATE' in log.action %}
+                                <span class="badge bg-success">{{ log.get_action_display }}</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ log.get_action_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="fw-bold">{{ log.module|title }}</div>
+                            <div class="text-muted" style="font-size: 0.8rem;">{{ log.object_type }} #{{ log.object_id }}</div>
+                        </td>
+                        <td style="max-width: 250px;" class="text-truncate" title="{{ log.object_repr }}">
+                            {{ log.object_repr }}
+                        </td>
+                        <td>
+                            {% if log.risk_level == 'critical' %}<span class="badge bg-danger"><i class="fas fa-exclamation-triangle"></i> Critique</span>
+                            {% elif log.risk_level == 'high' %}<span class="badge bg-warning text-dark"><i class="fas fa-exclamation"></i> Élevé</span>
+                            {% elif log.risk_level == 'medium' %}<span class="badge bg-info text-dark">Moyen</span>
+                            {% else %}<span class="badge bg-light text-muted">Faible</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if log.status == 'success' %}<i class="fas fa-check-circle text-success" title="Succès"></i>
+                            {% elif log.status == 'failed' %}<i class="fas fa-times-circle text-danger" title="Échec"></i>
+                            {% else %}<i class="fas fa-shield-alt text-warning" title="Bloqué"></i>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center py-5 text-muted">
+                            <i class="fas fa-search fa-3x mb-3 text-light"></i><br>
+                            Aucun enregistrement d'audit ne correspond à vos critères.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% if is_paginated %}
+    <div class="card-footer bg-white">
+        <nav aria-label="Pagination d'audit">
+            <ul class="pagination pagination-sm justify-content-center mb-0">
+                {% if page_obj.has_previous %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.action %}&action={{ request.GET.action }}{% endif %}">Précédent</a></li>
+                {% endif %}
+                
+                <li class="page-item active"><span class="page-link">Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}</span></li>
+                
+                {% if page_obj.has_next %}
+                <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.action %}&action={{ request.GET.action }}{% endif %}">Suivant</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Factures Fournisseurs - BTP Algeria{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Facturation Fournisseurs</h1>
+        <a href="{% url 'facture_create' %}" class="btn btn-primary">
+            <i class="fas fa-file-invoice me-2"></i>Enregistrer Facture
+        </a>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Réf. BTP</th>
+                            <th>Fournisseur</th>
+                            <th>Date Facture</th>
+                            <th>Montant TTC</th>
+                            <th>Solde à Payer</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for f in factures %}
+                        <tr>
+                            <td>{{ f.reference }}</td>
+                            <td>{{ f.fournisseur.raison_sociale }}</td>
+                            <td>{{ f.date_facture|date:"d/m/Y" }}</td>
+                            <td class="font-weight-bold">{{ f.montant_ttc_dzd|floatformat:2 }}</td>
+                            <td class="text-danger">{{ f.solde_dzd|floatformat:2 }}</td>
+                            <td>
+                                {% if f.statut == 'payee_total' %}
+                                    <span class="badge bg-success">Payée</span>
+                                {% elif f.statut == 'payee_partiel' %}
+                                    <span class="badge bg-info">Partiel</span>
+                                {% elif f.statut == 'litige' %}
+                                    <span class="badge bg-danger">Litige</span>
+                                {% else %}
+                                    <span class="badge bg-warning text-dark">{{ f.get_statut_display }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{{ f.fichier_facture.url }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr><td colspan="7" class="text-center">Aucune facture enregistrée.</td></tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

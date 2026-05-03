@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTP Algeria - Excellence en Construction</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8f9fa; }
+        .hero {
+            background: linear-gradient(rgba(27, 58, 107, 0.8), rgba(27, 58, 107, 0.9)), url('https://images.unsplash.com/photo-1541888086425-d81bb19240f5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover;
+            color: white;
+            padding: 100px 0;
+            text-align: center;
+        }
+        .hero h1 { font-weight: 800; font-size: 3.5rem; margin-bottom: 20px; }
+        .hero p { font-size: 1.2rem; margin-bottom: 40px; font-weight: 300; opacity: 0.9; }
+        .btn-custom { background-color: #F8B400; color: #1B3A6B; font-weight: 700; padding: 12px 30px; border-radius: 50px; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s; }
+        .btn-custom:hover { background-color: #e5a700; color: #1B3A6B; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(248, 180, 0, 0.4); }
+        .section-title { font-weight: 800; color: #1B3A6B; text-align: center; margin-bottom: 50px; text-transform: uppercase; }
+        .project-card { border: none; border-radius: 15px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.1); transition: transform 0.3s; }
+        .project-card:hover { transform: translateY(-10px); }
+        .project-img { height: 250px; object-fit: cover; width: 100%; }
+        .contact-section { background-color: white; padding: 80px 0; }
+        .footer { background-color: #0D1E3A; color: rgba(255,255,255,0.7); padding: 30px 0; text-align: center; }
+        .navbar-custom { background-color: #1B3A6B; padding: 15px 0; }
+        .navbar-brand { font-weight: 800; color: white !important; font-size: 1.5rem; }
+        .nav-link { color: rgba(255,255,255,0.8) !important; font-weight: 600; }
+        .nav-link:hover { color: #F8B400 !important; }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-custom sticky-top shadow">
+        <div class="container">
+            <a class="navbar-brand" href="#"><i class="fas fa-city text-warning me-2"></i>BTP Algeria</a>
+            <button class="navbar-toggler text-white border-white" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item"><a class="nav-link" href="#projets">Nos Réalisations</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+                    <li class="nav-item ms-lg-3">
+                        <a href="{% url 'login' %}" class="btn btn-outline-warning rounded-pill px-4 btn-sm fw-bold">Espace Collaborateur</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="container">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-pill mx-auto mb-4" style="max-width: 600px;">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+            <h1>Construisons l'Avenir de l'Algérie</h1>
+            <p>Leader dans la construction d'infrastructures majeures, bâtiments civils et industriels.<br>Expertise, Qualité et Respect des délais.</p>
+            <a href="#contact" class="btn btn-custom text-decoration-none">Demander un Devis</a>
+        </div>
+    </div>
+
+    <!-- Projets Réalisés -->
+    <div class="container py-5" id="projets">
+        <h2 class="section-title">Nos Réalisations</h2>
+        <div class="row g-4">
+            {% for projet in projets_realises %}
+            <div class="col-md-4">
+                <div class="card project-card h-100">
+                    <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" class="project-img" alt="Projet BTP">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold text-primary">{{ projet.intitule }}</h5>
+                        <p class="card-text text-muted mb-1"><i class="fas fa-map-marker-alt me-2 text-danger"></i>{{ projet.commune_chantier }}</p>
+                        <p class="card-text text-muted"><i class="fas fa-user-tie me-2 text-info"></i>Client: {{ projet.client.nom }}</p>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-md-4">
+                <div class="card project-card h-100">
+                    <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" class="project-img" alt="Tour de Bureau">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold text-primary">Tour de Bureau Moderne</h5>
+                        <p class="card-text text-muted mb-1"><i class="fas fa-map-marker-alt me-2 text-danger"></i>Alger Centre</p>
+                        <p class="card-text text-muted"><i class="fas fa-user-tie me-2 text-info"></i>Client: Ministère</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card project-card h-100">
+                    <img src="https://images.unsplash.com/photo-1541888086425-d81bb19240f5?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" class="project-img" alt="Infrastructure">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold text-primary">Viaduc Autoroutier</h5>
+                        <p class="card-text text-muted mb-1"><i class="fas fa-map-marker-alt me-2 text-danger"></i>Bouira</p>
+                        <p class="card-text text-muted"><i class="fas fa-user-tie me-2 text-info"></i>Client: ANA</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card project-card h-100">
+                    <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" class="project-img" alt="Résidentiel">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold text-primary">Complexe Résidentiel 500 Logements</h5>
+                        <p class="card-text text-muted mb-1"><i class="fas fa-map-marker-alt me-2 text-danger"></i>Oran</p>
+                        <p class="card-text text-muted"><i class="fas fa-user-tie me-2 text-info"></i>Client: OPGI</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Contact Form -->
+    <div class="contact-section" id="contact">
+        <div class="container">
+            <h2 class="section-title">Nous Contacter</h2>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-lg" style="border-radius: 15px;">
+                        <div class="card-body p-5">
+                            <form method="POST" action="{% url 'public_landing' %}">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Nom Complet</label>
+                                        <input type="text" name="nom_complet" class="form-control form-control-lg" placeholder="Votre nom" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label fw-bold">Email</label>
+                                        <input type="email" name="email" class="form-control form-control-lg" placeholder="nom@entreprise.com" required>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Sujet</label>
+                                    <input type="text" name="sujet" class="form-control form-control-lg" placeholder="Demande de devis, Partenariat..." required>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Message</label>
+                                    <textarea name="message" class="form-control form-control-lg" rows="4" placeholder="Détaillez votre projet ici..." required></textarea>
+                                </div>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary btn-lg fw-bold" style="background-color: #1B3A6B; border:none;">
+                                        <i class="fas fa-paper-plane me-2"></i>Envoyer le message
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row mb-4">
+                <div class="col-md-4 mb-3">
+                    <h5 class="text-white fw-bold mb-3"><i class="fas fa-city text-warning me-2"></i>BTP Algeria</h5>
+                    <p class="small">L'excellence dans la construction depuis plus de 20 ans. Nous bâtissons l'avenir avec passion et rigueur.</p>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <h5 class="text-white fw-bold mb-3">Contact</h5>
+                    <p class="small mb-1"><i class="fas fa-map-marker-alt me-2"></i> Zone Industrielle Rouiba, Alger</p>
+                    <p class="small mb-1"><i class="fas fa-phone me-2"></i> +213 21 00 00 00</p>
+                    <p class="small mb-0"><i class="fas fa-envelope me-2"></i> contact@btp-algeria.dz</p>
+                </div>
+                <div class="col-md-4">
+                    <h5 class="text-white fw-bold mb-3">Réseaux Sociaux</h5>
+                    <a href="#" class="text-white me-3 fs-4"><i class="fab fa-linkedin"></i></a>
+                    <a href="#" class="text-white me-3 fs-4"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-white fs-4"><i class="fab fa-facebook"></i></a>
+                </div>
+            </div>
+            <hr class="border-secondary">
+            <p class="mb-0 small">&copy; 2026 BTP Algeria. Tous droits réservés. Système d'Information ERP Sécurisé.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard RH - BTP Algeria{% endblock %}
+
+{% block content %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Tableau de Bord Ressources Humaines</h1>
+</div>
+
+<div class="row">
+    <div class="col-xl-3 col-md-6 mb-4">
+        {% include 'components/kpi_card.html' with label="Effectif Total" value=effectif_total icon="fas fa-users" color="primary" %}
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        {% include 'components/kpi_card.html' with label="Absences (Aujourd'hui)" value="4" icon="fas fa-user-slash" color="warning" %}
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        {% include 'components/kpi_card.html' with label="Congés en cours" value="12" icon="fas fa-umbrella-beach" color="info" %}
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        {% include 'components/kpi_card.html' with label="CDD Expirant (30j)" value="3" icon="fas fa-file-contract" color="danger" %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card shadow mb-4 border-0">
+            <div class="card-header py-3 bg-white">
+                <h6 class="m-0 font-weight-bold text-primary">Répartition par Catégorie</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="rhCategoryChart" style="height: 300px;"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="card shadow mb-4 border-0">
+            <div class="card-header py-3 bg-white">
+                <h6 class="m-0 font-weight-bold text-primary">Masse Salariale (Millions DZD)</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="payrollChart" style="height: 300px;"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    new Chart(document.getElementById('rhCategoryChart'), {
+        type: 'bar',
+        data: {
+            labels: ["Cadres", "Maîtrise", "Exécution", "Consultants"],
+            datasets: [{
+                label: "Nombre d'employés",
+                data: [15, 28, 145, 8],
+                backgroundColor: '#1B3A6B'
+            }]
+        }
+    });
+
+    new Chart(document.getElementById('payrollChart'), {
+        type: 'line',
+        data: {
+            labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+            datasets: [{
+                label: "Masse Salariale",
+                data: [12.5, 12.8, 12.4, 13.2, 13.5, 14.1],
+                borderColor: '#1cc88a',
+                fill: false
+            }]
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}

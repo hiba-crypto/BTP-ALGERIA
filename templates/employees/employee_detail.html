@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}Employé {{ employe.matricule }} - BTP Algeria{% endblock %}
+{% block page_title %}Fiche Employé{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body text-center">
+                {% if employe.photo %}
+                <img src="{{ employe.photo.url }}" class="rounded-circle mb-3 img-thumbnail" width="120" height="120" alt="Photo">
+                {% else %}
+                <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 120px; height: 120px;">
+                    <i class="fas fa-user fa-3x"></i>
+                </div>
+                {% endif %}
+                <h5 class="fw-bold">{{ employe.nom }} {{ employe.prenom }}</h5>
+                <p class="text-muted mb-1">{{ employe.poste.titre }}</p>
+                <span class="badge {% if employe.statut == 'actif' %}bg-success{% else %}bg-secondary{% endif %} mb-3">{{ employe.get_statut_display }}</span>
+                
+                <hr>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'employee_update' employe.id %}" class="btn btn-outline-primary btn-sm">Modifier Profil</a>
+                    <form action="{% url 'employee_delete' employe.id %}" method="post" onsubmit="return confirm('Archiver cet employé ?');">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-danger btn-sm w-100">Désactiver</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-9">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white pt-3 border-bottom-0">
+                <ul class="nav nav-tabs border-bottom-0">
+                    <li class="nav-item"><a class="nav-link active fw-bold" data-bs-toggle="tab" href="#profil"><i class="fas fa-id-card me-1"></i> Profil</a></li>
+                    <li class="nav-item"><a class="nav-link fw-bold" data-bs-toggle="tab" href="#contrat"><i class="fas fa-file-signature me-1"></i> Contrat</a></li>
+                </ul>
+            </div>
+            <div class="card-body border-top pt-4">
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="profil">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <h6 class="fw-bold text-primary border-bottom pb-2">Identité</h6>
+                                <p class="mb-1"><span class="text-muted">Matricule:</span> {{ employe.matricule }}</p>
+                                <p class="mb-1"><span class="text-muted">Nom Arabe:</span> {{ employe.nom_arabe }}</p>
+                                <p class="mb-1"><span class="text-muted">Né(e) le:</span> {{ employe.date_naissance|date:"d/m/Y" }} à {{ employe.commune_naissance }}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h6 class="fw-bold text-primary border-bottom pb-2">Contact</h6>
+                                <p class="mb-1"><span class="text-muted">Tél:</span> {{ employe.telephone }}</p>
+                                <p class="mb-1"><span class="text-muted">Email:</span> {{ employe.email_pro|default:"-" }}</p>
+                                <p class="mb-1"><span class="text-muted">Urgence:</span> {{ employe.contact_urgence_nom }} ({{ employe.contact_urgence_tel }})</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="contrat">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <p class="mb-1"><span class="text-muted">Type:</span> {{ employe.get_type_contrat_display }}</p>
+                                <p class="mb-1"><span class="text-muted">Embauche:</span> {{ employe.date_embauche|date:"d/m/Y" }}</p>
+                                <p class="mb-1"><span class="text-muted">Projet:</span> {{ employe.projet_affecte|default:"Aucun" }}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <p class="mb-1"><span class="text-muted">Salaire Base:</span> *********** DZD (Sécurisé)</p>
+                                <p class="mb-1"><span class="text-muted">Paiement:</span> {{ employe.get_mode_paiement_display }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

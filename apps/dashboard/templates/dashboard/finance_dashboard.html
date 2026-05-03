@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block title %}Tableau de Bord Finance - BTP Algeria{% endblock %}
+
+{% block content %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4 animated-fade-in">
+    <h1 class="h3 mb-0 text-gray-800 fw-bold">Gestion Financière & Comptable</h1>
+</div>
+
+<div class="row animated-fade-in">
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card kpi-card shadow h-100 py-2 glass-card">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="card-title mb-1">Total Trésorerie</div>
+                        <div class="kpi-value text-success">{{ total_cash }} DZD</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-university fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-4 col-md-6 mb-4">
+        <div class="card kpi-card shadow h-100 py-2 glass-card" style="border-left-color: #36b9cc;">
+            <div class="card-body">
+                <div class="row no-gutters align-items-center">
+                    <div class="col mr-2">
+                        <div class="card-title mb-1" style="color: #36b9cc;">Dettes Fournisseurs</div>
+                        <div class="kpi-value">1,450,000.00 DZD</div>
+                    </div>
+                    <div class="col-auto">
+                        <i class="fas fa-exclamation-circle fa-2x text-gray-300"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row animated-fade-in" style="animation-delay: 0.1s;">
+    <!-- Cash Flow Chart -->
+    <div class="col-xl-8 col-lg-7">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Analyse des Flux de Trésorerie (DZD)</h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-area">
+                    <canvas id="financeFlowChart" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Expenses Pie Chart -->
+    <div class="col-xl-4 col-lg-5">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Structure des Coûts</h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-pie pt-4">
+                    <canvas id="expensesPieChart" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow mb-4 animated-fade-in" style="animation-delay: 0.2s;">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Comptes Bancaires Actifs</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Banque</th>
+                        <th>Intitulé</th>
+                        <th>Devise</th>
+                        <th>Solde</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for compte in comptes %}
+                    <tr>
+                        <td>{{ compte.banque }}</td>
+                        <td>{{ compte.intitule }}</td>
+                        <td>{{ compte.devise }}</td>
+                        <td class="fw-bold">{{ compte.solde_dzd }} DZD</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center">Aucun compte bancaire configuré.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Chart 1: Cash Flow Evolution
+    const ctxFlow = document.getElementById('financeFlowChart').getContext('2d');
+    new Chart(ctxFlow, {
+        type: 'line',
+        data: {
+            labels: ["Jan", "Fév", "Mar", "Avr", "Mai", "Juin"],
+            datasets: [{
+                label: "Entrées (Encaissements)",
+                borderColor: "#1cc88a",
+                backgroundColor: "rgba(28, 200, 138, 0.05)",
+                data: [5000000, 4500000, 7000000, 5500000, 8000000, 9500000],
+                tension: 0.3
+            }, {
+                label: "Sorties (Décaissements)",
+                borderColor: "#e74a3b",
+                backgroundColor: "rgba(231, 74, 59, 0.05)",
+                data: [3000000, 4000000, 3500000, 5000000, 4500000, 6000000],
+                tension: 0.3
+            }]
+        },
+        options: { maintainAspectRatio: false }
+    });
+
+    // Chart 2: Expenses Structure
+    const ctxPie = document.getElementById('expensesPieChart').getContext('2d');
+    new Chart(ctxPie, {
+        type: 'doughnut',
+        data: {
+            labels: ["Salaires", "Achats Fournisseurs", "Carburant & Fleet", "Taxes (TAP/TVA)"],
+            datasets: [{
+                data: [40, 35, 15, 10],
+                backgroundColor: ['#4e73df', '#1cc88a', '#f6c23e', '#e74a3b'],
+                hoverOffset: 4
+            }]
+        },
+        options: { maintainAspectRatio: false }
+    });
+</script>
+{% endblock %}

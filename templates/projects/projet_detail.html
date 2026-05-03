@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+{% load l10n %}
+
+{% block title %}Projet {{ projet.reference }} - BTP Algeria{% endblock %}
+{% block page_title %}{{ projet.reference }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+                <h6 class="fw-bold text-primary mb-3">Informations Clés</h6>
+                <div class="mb-2">
+                    <small class="text-muted d-block">Montant Marché (TTC)</small>
+                    <strong class="fs-5">{{ projet.montant_marche_ttc_dzd }} DZD</strong>
+                </div>
+                <div class="mb-2">
+                    <small class="text-muted d-block">Client</small>
+                    <strong>{{ projet.client.nom }}</strong>
+                </div>
+                <div class="mb-3">
+                    <small class="text-muted d-block">Avancement Financier</small>
+                    <div class="progress mt-1" style="height: 10px;">
+                        <div class="progress-bar bg-success" style="width: {{ projet.avancement_pct|unlocalize }}%"></div>
+                    </div>
+                    <div class="text-end small fw-bold mt-1">{{ projet.avancement_pct }}%</div>
+                </div>
+                <hr>
+                <div class="mb-2">
+                    <small class="text-muted d-block">Marge Brute (Est.)</small>
+                    <strong class="{% if rentabilite.marge_brute_dzd >= 0 %}text-success{% else %}text-danger{% endif %}">
+                        {{ rentabilite.marge_brute_dzd|floatformat:0 }} DZD ({{ rentabilite.marge_brute_pct }}%)
+                    </strong>
+                </div>
+                <hr>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'projet_update' projet.id %}" class="btn btn-outline-primary btn-sm">Modifier le projet</a>
+                    <a href="{% url 'situation_create' projet.id %}" class="btn btn-success btn-sm">Saisir Situation</a>
+                    <a href="{% url 'projet_rentabilite' projet.id %}" class="btn btn-warning btn-sm text-dark">Rentabilité détaillée</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-9">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white pt-3 border-bottom-0">
+                <ul class="nav nav-tabs border-bottom-0">
+                    <li class="nav-item"><a class="nav-link active fw-bold" data-bs-toggle="tab" href="#resume"><i class="fas fa-info-circle me-1"></i> Résumé</a></li>
+                    <li class="nav-item"><a class="nav-link fw-bold" data-bs-toggle="tab" href="#situations"><i class="fas fa-file-invoice me-1"></i> Situations ({{ situations.count }})</a></li>
+                    <li class="nav-item"><a class="nav-link fw-bold" data-bs-toggle="tab" href="#materiel"><i class="fas fa-truck-pickup me-1"></i> Matériel ({{ allocations.count }})</a></li>
+                    <li class="nav-item"><a class="nav-link fw-bold" data-bs-toggle="tab" href="#achats"><i class="fas fa-shopping-cart me-1"></i> Achats ({{ achats.count }})</a></li>
+                </ul>
+            </div>
+            <div class="card-body border-top pt-4">
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="resume">
+                        <h4 class="fw-bold">{{ projet.intitule }}</h4>
+                        <p class="text-muted"><i class="fas fa-map-marker-alt text-danger me-1"></i> {{ projet.commune_chantier }} ({{ projet.wilaya_chantier.nom }})</p>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-6 mb-3">
+                                <h6 class="fw-bold text-primary border-bottom pb-2">Délais contractuels</h6>
+                                <p class="mb-1"><span class="text-muted">OS :</span> {{ projet.date_ordre_service|date:"d/m/Y" }}</p>
+                                <p class="mb-1"><span class="text-muted">Délai :</span> {{ projet.delai_execution_jours }} jours</p>
+                                <p class="mb-1"><span class="text-muted">Fin Prévue :</span> {{ projet.date_fin_contractuelle|date:"d/m/Y" }}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h6 class="fw-bold text-primary border-bottom pb-2">Équipe</h6>
+                                <p class="mb-1"><span class="text-muted">Chef de Projet :</span> {{ projet.chef_projet|default:"Non assigné" }}</p>
+                                <p class="mb-1"><span class="text-muted">Conducteur Vx :</span> {{ projet.conducteur_travaux|default:"Non assigné" }}</p>
+                            </div>
+                        </div>
+
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <h6 class="fw-bold text-primary border-bottom pb-2">Analyse de la Rentabilité Réelle</h6>
+                                <div class="row text-center mt-3">
+                                    <div class="col-md-3 border-end">
+                                        <div class="small text-muted">Achats Matériaux</div>
+                                        <div class="fw-bold">{{ rentabilite.cout_materiaux_dzd|floatformat:0 }} DZD</div>
+                                    </div>
+                                    <div class="col-md-3 border-end">
+                                        <div class="small text-muted">Location Engins</div>
+                                        <div class="fw-bold">{{ rentabilite.cout_engins_dzd|floatformat:0 }} DZD</div>
+                                    </div>
+                                    <div class="col-md-3 border-end">
+                                        <div class="small text-muted">Main d'Œuvre (MO)</div>
+                                        <div class="fw-bold">{{ rentabilite.cout_mo_dzd|floatformat:0 }} DZD</div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="small text-muted">Bénéfice Net</div>
+                                        <div class="fw-bold text-success">{{ rentabilite.marge_nette_dzd|floatformat:0 }} DZD</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane fade" id="materiel">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Engin</th>
+                                    <th>Type</th>
+                                    <th>Début Allocation</th>
+                                    <th>Heures Travaillées</th>
+                                    <th>Coût Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for a in allocations %}
+                                <tr>
+                                    <td><a href="{% url 'engin_detail' a.engin.id %}" class="fw-bold">{{ a.engin.code }} - {{ a.engin.designation }}</a></td>
+                                    <td>{{ a.engin.type_engin.nom }}</td>
+                                    <td>{{ a.date_debut|date:"d/m/Y" }}</td>
+                                    <td>{{ a.heures_travaillees }} h</td>
+                                    <td class="text-danger fw-bold">{{ a.cout_total_dzd }} DZD</td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="5" class="text-center py-3 text-muted">Aucun matériel alloué à ce projet.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <div class="mt-3">
+                            <a href="{% url 'allocation_create' projet.pk %}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-plus me-1"></i>Allouer un nouvel engin
+                            </a>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="situations">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>N°</th>
+                                    <th>Mois/Année</th>
+                                    <th>Montant Cumul HT</th>
+                                    <th>Net à Payer TTC</th>
+                                    <th>Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for s in situations %}
+                                <tr>
+                                    <td>Situation N°{{ s.numero }}</td>
+                                    <td>{{ s.mois }}/{{ s.annee }}</td>
+                                    <td>{{ s.montant_cumul_ht_dzd }} DZD</td>
+                                    <td class="fw-bold text-success">{{ s.net_ttc_dzd }} DZD</td>
+                                    <td><span class="badge bg-primary">{{ s.get_statut_display }}</span></td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="5" class="text-center py-3 text-muted">Aucune situation de travaux.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="tab-pane fade" id="achats">
+                        <table class="table table-sm table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Réf. Commande</th>
+                                    <th>Date</th>
+                                    <th>Fournisseur</th>
+                                    <th>Montant HT</th>
+                                    <th>Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for achat in achats %}
+                                <tr>
+                                    <td><a href="{% url 'bon_commande_detail' achat.id %}" class="fw-bold">{{ achat.reference }}</a></td>
+                                    <td>{{ achat.date_commande|date:"d/m/Y" }}</td>
+                                    <td>{{ achat.fournisseur.raison_sociale }}</td>
+                                    <td class="fw-bold text-danger">{{ achat.montant_ht_dzd }} DZD</td>
+                                    <td><span class="badge bg-info">{{ achat.get_statut_display }}</span></td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="5" class="text-center py-3 text-muted">Aucun achat effectué pour ce projet.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

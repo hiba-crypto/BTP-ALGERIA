@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard Finance - BTP Algeria{% endblock %}
+
+{% block content %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Gestion Financière & Trésorerie</h1>
+</div>
+
+<div class="row">
+    <div class="col-xl-3 col-md-6 mb-4">
+        {% include 'components/kpi_card.html' with label="Trésorerie Totale" value=total_cash|floatformat:2 icon="fas fa-wallet" color="success" %}
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        {% include 'components/kpi_card.html' with label="Créances Clients" value="24 500 000.00" icon="fas fa-hand-holding-usd" color="primary" %}
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        {% include 'components/kpi_card.html' with label="Dettes Fournisseurs" value="12 800 000.00" icon="fas fa-file-invoice-dollar" color="warning" %}
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        {% include 'components/kpi_card.html' with label="TVA à Déclarer" value="1 240 500.00" icon="fas fa-percent" color="info" %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-7">
+        <div class="card shadow mb-4 border-0">
+            <div class="card-header py-3 bg-white">
+                <h6 class="m-0 font-weight-bold text-primary">Recettes vs Dépenses (DZD)</h6>
+            </div>
+            <div class="card-body">
+                <canvas id="cashFlowChart" style="height: 350px;"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card shadow mb-4 border-0">
+            <div class="card-header py-3 bg-white">
+                <h6 class="m-0 font-weight-bold text-primary">Soldes Bancaires</h6>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Banque</th>
+                                <th class="text-end">Solde</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in comptes %}
+                            <tr>
+                                <td><i class="fas fa-university me-2 text-muted"></i>{{ c.banque }}</td>
+                                <td class="text-end fw-bold">{{ c.solde_dzd|floatformat:2 }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+    new Chart(document.getElementById('cashFlowChart'), {
+        type: 'bar',
+        data: {
+            labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+            datasets: [
+                {
+                    label: "Recettes",
+                    data: [8.5, 9.2, 7.8, 11.5, 10.2, 12.8],
+                    backgroundColor: '#1cc88a'
+                },
+                {
+                    label: "Dépenses",
+                    data: [7.2, 8.1, 7.5, 8.8, 9.1, 9.5],
+                    backgroundColor: '#e74a3b'
+                }
+            ]
+        },
+        options: {
+            scales: { y: { beginAtZero: true, title: { display: true, text: 'Millions DZD' } } }
+        }
+    });
+</script>
+{% endblock %}
+{% endblock %}

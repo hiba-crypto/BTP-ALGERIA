@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load l10n %}
+
+{% block title %}Rentabilité Projet - BTP Algeria{% endblock %}
+{% block page_title %}Analyse Financière : {{ projet.reference }}{% endblock %}
+
+{% block extra_css %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white shadow-sm border-0">
+            <div class="card-body text-center">
+                <h6 class="text-white-50 text-uppercase fw-bold">CA Réalisé (Validé)</h6>
+                <h4>{{ rentabilite.ca_realise_dzd }} DZD</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-danger text-white shadow-sm border-0">
+            <div class="card-body text-center">
+                <h6 class="text-white-50 text-uppercase fw-bold">Coûts Totaux</h6>
+                <h4>{{ rentabilite.couts_totaux_dzd }} DZD</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-dark shadow-sm border-0">
+            <div class="card-body text-center">
+                <h6 class="text-dark-50 text-uppercase fw-bold">Marge Brute</h6>
+                <h4>{{ rentabilite.marge_brute_dzd }} DZD</h4>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white shadow-sm border-0">
+            <div class="card-body text-center">
+                <h6 class="text-white-50 text-uppercase fw-bold">Marge Nette (%)</h6>
+                <h4>{{ rentabilite.marge_nette_pct }} %</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3"><h5 class="mb-0 text-primary">Répartition des Coûts</h5></div>
+            <div class="card-body d-flex justify-content-center align-items-center">
+                <canvas id="costsChart" style="max-height: 300px;"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3"><h5 class="mb-0 text-primary">Détails</h5></div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Main d'Oeuvre <span class="badge bg-secondary rounded-pill">{{ rentabilite.cout_mo_dzd }} DZD</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Matériaux <span class="badge bg-secondary rounded-pill">{{ rentabilite.cout_materiaux_dzd }} DZD</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Engins <span class="badge bg-secondary rounded-pill">{{ rentabilite.cout_engins_dzd }} DZD</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        Sous-Traitance <span class="badge bg-secondary rounded-pill">{{ rentabilite.cout_sous_traitance_dzd }} DZD</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center list-group-item-danger">
+                        Pénalités Retard <span class="badge bg-danger rounded-pill">{{ rentabilite.penalites_dzd }} DZD</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ rentabilite.cout_mo_dzd|unlocalize|json_script:"cout_mo" }}
+{{ rentabilite.cout_materiaux_dzd|unlocalize|json_script:"cout_mat" }}
+{{ rentabilite.cout_engins_dzd|unlocalize|json_script:"cout_eng" }}
+{{ rentabilite.cout_sous_traitance_dzd|unlocalize|json_script:"cout_st" }}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const cout_mo = parseFloat(JSON.parse(document.getElementById('cout_mo').textContent)) || 0;
+        const cout_mat = parseFloat(JSON.parse(document.getElementById('cout_mat').textContent)) || 0;
+        const cout_eng = parseFloat(JSON.parse(document.getElementById('cout_eng').textContent)) || 0;
+        const cout_st = parseFloat(JSON.parse(document.getElementById('cout_st').textContent)) || 0;
+
+        const ctx = document.getElementById('costsChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Main d\'Oeuvre', 'Matériaux', 'Engins', 'Sous-Traitance'],
+                datasets: [{
+                    data: [cout_mo, cout_mat, cout_eng, cout_st],
+                    backgroundColor: ['#1B3A6B', '#C8941A', '#343a40', '#17a2b8']
+                }]
+            }
+        });
+    });
+</script>
+{% endblock %}

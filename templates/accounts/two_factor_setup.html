@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Configuration 2FA - BTP Algeria{% endblock %}
+{% block page_title %}Configuration de l'authentification à deux facteurs{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 mt-4">
+            <div class="card-header bg-white py-3 text-center">
+                <h5 class="mb-0 text-primary"><i class="fas fa-qrcode me-2"></i>Configuration 2FA</h5>
+            </div>
+            <div class="card-body text-center p-4">
+                <p class="text-muted mb-4">
+                    Scannez ce QR code avec votre application d'authentification (Google Authenticator, Authy, etc.), puis entrez le code à 6 chiffres généré pour confirmer l'activation.
+                </p>
+                
+                <div class="mb-4">
+                    <img src="data:image/png;base64,{{ qr_image }}" alt="QR Code 2FA" class="img-fluid border p-2 rounded">
+                </div>
+                
+                <form method="post" class="mt-4 px-md-5">
+                    {% csrf_token %}
+                    <div class="input-group mb-3">
+                        <input type="text" name="code" class="form-control text-center fs-4 letter-spacing-2" placeholder="123456" maxlength="6" required autocomplete="off">
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 fw-bold">Activer</button>
+                    <a href="{% url 'profile' %}" class="btn btn-link w-100 text-muted mt-2">Annuler</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    .letter-spacing-2 { letter-spacing: 0.5rem; }
+</style>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Journal Comptable - BTP Algeria{% endblock %}
+{% block page_title %}Journal des Écritures Comptables{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <a href="{% url 'ecriture_add' %}" class="btn btn-primary btn-sm"><i class="fas fa-plus me-1"></i> Nouvelle Écriture</a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-3">Référence</th>
+                        <th>Date</th>
+                        <th>Compte Débit</th>
+                        <th>Compte Crédit</th>
+                        <th>Libellé</th>
+                        <th>Montant</th>
+                        <th>Statut</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for e in ecritures %}
+                    <tr>
+                        <td class="ps-3 fw-bold">{{ e.reference }}</td>
+                        <td>{{ e.date_ecriture|date:"d/m/Y" }}</td>
+                        <td><span class="badge bg-light text-dark border">{{ e.compte_debit.numero }}</span></td>
+                        <td><span class="badge bg-light text-dark border">{{ e.compte_credit.numero }}</span></td>
+                        <td>{{ e.libelle }}</td>
+                        <td class="fw-bold">{{ e.montant_dzd }} DZD</td>
+                        <td>
+                            {% if e.statut == 'valide' %}<span class="badge bg-success">Validée</span>
+                            {% elif e.statut == 'lettree' %}<span class="badge bg-info">Lettrée</span>
+                            {% else %}<span class="badge bg-secondary">Brouillon</span>{% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="text-center py-4 text-muted">Aucune écriture comptable.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

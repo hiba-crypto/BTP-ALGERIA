@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}Mon Profil - BTP Algeria{% endblock %}
+{% block page_title %}Mon Profil{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 mb-4 text-center">
+            <div class="card-body py-5">
+                <div class="bg-primary text-white rounded-circle d-flex justify-content-center align-items-center mx-auto mb-3" style="width: 100px; height: 100px; font-size: 2.5rem;">
+                    {{ user.username|make_list|first|upper }}
+                </div>
+                <h4 class="fw-bold mb-0">{{ user.get_full_name|default:user.username }}</h4>
+                <p class="text-muted">{{ user.email }}</p>
+                <span class="badge bg-warning text-dark px-3 py-2 rounded-pill mb-4">{{ user.profile.role.nom|default:"Aucun rôle" }}</span>
+                
+                <hr>
+                
+                <div class="d-grid gap-2">
+                    <a href="{% url 'change_password' %}" class="btn btn-outline-primary"><i class="fas fa-key me-2"></i>Changer le mot de passe</a>
+                    
+                    {% if not user.profile.two_fa_enabled %}
+                    <a href="{% url 'two_factor_setup' %}" class="btn btn-outline-success"><i class="fas fa-shield-alt me-2"></i>Activer 2FA</a>
+                    {% else %}
+                    <button class="btn btn-success" disabled><i class="fas fa-check-circle me-2"></i>2FA Activé</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 text-primary"><i class="fas fa-info-circle me-2"></i>Informations système</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span class="text-muted">Dernière connexion</span>
+                        <span class="fw-bold">{{ user.last_login|date:"d/m/Y H:i" }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span class="text-muted">Dernière adresse IP</span>
+                        <span class="fw-bold">{{ user.profile.last_login_ip|default:"Inconnue" }}</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                        <span class="text-muted">Dernier changement de mot de passe</span>
+                        <span class="fw-bold">{{ user.profile.last_password_change|date:"d/m/Y H:i" }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

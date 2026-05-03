@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Nouvelle Demande d'Achat - BTP Algeria{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white py-3">
+                    <h5 class="mb-0">Créer une Demande d'Achat</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                {{ form.objet|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.projet|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form.urgence|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                {{ form.quantite|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                {{ form.unite|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                {{ form.montant_estime_dzd|as_crispy_field }}
+                            </div>
+                            <div class="col-md-12 mb-3">
+                                {{ form.justification|as_crispy_field }}
+                            </div>
+                        </div>
+                        <div class="mt-4 d-flex justify-content-between">
+                            <a href="{% url 'demande_achat_list' %}" class="btn btn-outline-secondary">Annuler</a>
+                            <button type="submit" class="btn btn-primary">Enregistrer la Demande</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

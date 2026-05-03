@@ -1,0 +1,19 @@
+<div class="card kpi-card shadow h-100 py-2 border-0 border-start border-4 border-{{ color|default:'primary' }}">
+    <div class="card-body">
+        <div class="row no-gutters align-items-center">
+            <div class="col mr-2">
+                <div class="text-xs font-weight-bold text-{{ color|default:'primary' }} text-uppercase mb-1">{{ label }}</div>
+                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ value }}</div>
+                {% if trend %}
+                    <div class="mt-2 mb-0 text-muted small">
+                        <span class="text-{{ trend_color|default:'success' }} mr-2"><i class="fa fa-arrow-{{ trend_icon|default:'up' }}"></i> {{ trend }}%</span>
+                        <span>depuis le mois dernier</span>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="col-auto">
+                <i class="{{ icon|default:'fas fa-calendar' }} fa-2x text-gray-300"></i>
+            </div>
+        </div>
+    </div>
+</div>

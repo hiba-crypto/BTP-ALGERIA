@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Employés - BTP Algeria{% endblock %}
+{% block page_title %}Ressources Humaines{% endblock %}
+
+{% block content %}
+<div class="card shadow-sm border-0 mb-4">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 text-primary"><i class="fas fa-users me-2"></i>Liste des Employés</h5>
+        <a href="{% url 'employee_create' %}" class="btn btn-primary btn-sm"><i class="fas fa-user-plus me-1"></i> Nouvel Employé</a>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-3">Matricule</th>
+                        <th>Nom & Prénom</th>
+                        <th>Poste</th>
+                        <th>Contrat</th>
+                        <th>Statut</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for emp in employes %}
+                    <tr>
+                        <td class="ps-3 fw-bold">{{ emp.matricule }}</td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                {% if emp.photo %}
+                                <img src="{{ emp.photo.url }}" class="rounded-circle me-2" width="40" height="40" alt="Photo">
+                                {% else %}
+                                <div class="bg-secondary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                                {% endif %}
+                                <div>
+                                    <div class="fw-bold">{{ emp.nom }} {{ emp.prenom }}</div>
+                                    <div class="small text-muted">{{ emp.telephone }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td>{{ emp.poste.titre }}</td>
+                        <td><span class="badge bg-info text-dark">{{ emp.get_type_contrat_display }}</span></td>
+                        <td>
+                            {% if emp.statut == 'actif' %}<span class="badge bg-success">Actif</span>
+                            {% elif emp.statut == 'conge' %}<span class="badge bg-warning text-dark">En Congé</span>
+                            {% else %}<span class="badge bg-danger">{{ emp.get_statut_display }}</span>{% endif %}
+                        </td>
+                        <td>
+                            <a href="{% url 'employee_detail' emp.id %}" class="btn btn-sm btn-outline-info"><i class="fas fa-eye"></i></a>
+                            <a href="{% url 'employee_update' emp.id %}" class="btn btn-sm btn-outline-primary"><i class="fas fa-edit"></i></a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="text-center py-4 text-muted">Aucun employé trouvé.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

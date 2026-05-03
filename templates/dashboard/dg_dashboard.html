@@ -1,0 +1,207 @@
+{% extends 'base.html' %}
+{% load l10n %}
+
+{% block title %}Dashboard DG - BTP Algeria{% endblock %}
+
+{% block content %}
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+    <h1 class="h3 mb-0 text-gray-800">Tableau de Bord Direction Générale</h1>
+    <a href="{% url 'export_dg_report_pdf' %}" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i> Générer Rapport Global</a>
+</div>
+
+<div class="row">
+    <!-- KPI Cards -->
+    <div class="col-xl-3 col-md-6 mb-4">
+        {% include 'components/kpi_card.html' with label="Chiffre d'Affaires" value=ca_total|floatformat:0|add:" DZD" icon="fas fa-money-bill-wave" color="primary" %}
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        {% include 'components/kpi_card.html' with label="Trésorerie Totale" value=tresorerie|floatformat:0|add:" DZD" icon="fas fa-university" color="success" %}
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        {% include 'components/kpi_card.html' with label="Projets actifs" value=projets_actifs icon="fas fa-hard-hat" color="info" %}
+    </div>
+    <div class="col-xl-3 col-md-6 mb-4">
+        {% include 'components/kpi_card.html' with label="Effectif Total" value=effectif icon="fas fa-users" color="warning" %}
+    </div>
+</div>
+
+<div class="row">
+    <!-- Charts -->
+    <div class="col-xl-8 col-lg-7">
+        <div class="card shadow mb-4 border-0">
+            <div class="card-header py-3 bg-white d-flex flex-row align-items-center justify-content-between">
+                <h6 class="m-0 font-weight-bold text-primary">Évolution du CA (Mensuel)</h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-area" style="height: 300px;">
+                    <canvas id="caChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pie Chart -->
+    <div class="col-xl-4 col-lg-5">
+        <div class="card shadow mb-4 border-0">
+            <div class="card-header py-3 bg-white">
+                <h6 class="m-0 font-weight-bold text-primary">Répartition des Charges (Rentabilité)</h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-pie pt-4 pb-2" style="height: 250px;">
+                    <canvas id="chargesPie"></canvas>
+                </div>
+                <div class="mt-4 text-center small">
+                    <span class="mr-2"><i class="fas fa-circle text-primary"></i> MO</span>
+                    <span class="mr-2"><i class="fas fa-circle text-success"></i> MAT</span>
+                    <span class="mr-2"><i class="fas fa-circle text-info"></i> ENG</span>
+                    <span class="mr-2"><i class="fas fa-circle text-warning"></i> ST</span>
+                    <span class="mr-2"><i class="fas fa-circle text-secondary"></i> FG</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Project Progress -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Avancement des Projets Réels</h6>
+            </div>
+            <div class="card-body">
+                {% for p in projets %}
+                <h4 class="small font-weight-bold">{{ p.intitule }} <span class="float-right">{{ p.avancement_pct }}%</span></h4>
+                <div class="progress mb-4">
+                    <div class="progress-bar {% if p.avancement_pct < 30 %}bg-danger{% elif p.avancement_pct < 70 %}bg-warning{% else %}bg-success{% endif %}" role="progressbar" style="width: {{ p.avancement_pct|unlocalize }}%" aria-valuenow="{{ p.avancement_pct|unlocalize }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Suppliers -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Performance Fournisseurs (Qualité)</h6>
+            </div>
+            <div class="card-body">
+                <div class="chart-bar" style="height: 300px;">
+                    <canvas id="supplierChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- External Requests -->
+    <div class="col-12 mb-4">
+        <div class="card shadow mb-4 border-left-primary">
+            <div class="card-header py-3 bg-white d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary"><i class="fas fa-envelope-open-text me-2"></i>Demandes de Contact & Devis (Externes)</h6>
+                <span class="badge bg-danger">{{ demandes_externes.count }} Nouvelles</span>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Date</th>
+                                <th>Nom</th>
+                                <th>Email</th>
+                                <th>Sujet</th>
+                                <th>Message</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for req in demandes_externes %}
+                            <tr>
+                                <td class="small">{{ req.date_envoi|date:"d/m/Y H:i" }}</td>
+                                <td class="fw-bold">{{ req.nom_complet }}</td>
+                                <td><a href="mailto:{{ req.email }}">{{ req.email }}</a></td>
+                                <td><span class="badge bg-light text-dark border">{{ req.sujet }}</span></td>
+                                <td class="small text-truncate" style="max-width: 300px;">{{ req.message }}</td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline-success"><i class="fas fa-check"></i> Traité</button>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">Aucune nouvelle demande externe.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // CA Chart
+    const caCtx = document.getElementById('caChart').getContext('2d');
+    new Chart(caCtx, {
+        type: 'line',
+        data: {
+            labels: {{ chart_ca_labels|safe }},
+            datasets: [{
+                label: "CA Réalisé (DZD)",
+                data: {{ chart_ca_data|safe }},
+                borderColor: '#1B3A6B',
+                backgroundColor: 'rgba(27, 58, 107, 0.05)',
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: {
+                y: { beginAtZero: true, ticks: { callback: function(value) { return value.toLocaleString() + ' DZD'; } } }
+            }
+        }
+    });
+
+    // Charges Pie
+    const pieCtx = document.getElementById('chargesPie').getContext('2d');
+    new Chart(pieCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ["Main d'œuvre", "Matériaux", "Engins", "Sous-traitance", "Frais Généraux"],
+            datasets: [{
+                data: {{ chart_budget_data|safe }},
+                backgroundColor: ['#1B3A6B', '#1cc88a', '#36b9cc', '#f6c23e', '#858796'],
+                hoverBackgroundColor: ['#122849', '#17a673', '#2c9faf', '#dda20a', '#6e707e'],
+            }],
+        },
+        options: {
+            maintainAspectRatio: false,
+            cutout: '70%',
+            plugins: { legend: { display: false } }
+        }
+    });
+
+    // Supplier Chart
+    const supCtx = document.getElementById('supplierChart').getContext('2d');
+    new Chart(supCtx, {
+        type: 'bar',
+        data: {
+            labels: {{ supplier_labels|safe }},
+            datasets: [{
+                label: "Note Qualité / 5",
+                data: {{ supplier_notes|safe }},
+                backgroundColor: '#1B3A6B',
+            }]
+        },
+        options: {
+            maintainAspectRatio: false,
+            scales: { y: { beginAtZero: true, max: 5 } }
+        }
+    });
+</script>
+{% endblock %}

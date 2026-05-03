@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ fournisseur.raison_sociale }} - BTP Algeria{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'fournisseur_list' %}">Fournisseurs</a></li>
+                <li class="breadcrumb-item active">{{ fournisseur.code }}</li>
+            </ol>
+        </nav>
+        <a href="{% url 'fournisseur_update' fournisseur.id %}" class="btn btn-primary btn-sm">
+            <i class="fas fa-edit me-1"></i> Modifier
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="card shadow mb-4">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="fas fa-building fa-4x text-primary"></i>
+                    </div>
+                    <h4 class="font-weight-bold">{{ fournisseur.raison_sociale }}</h4>
+                    <p class="text-muted mb-1">{{ fournisseur.forme_juridique }}</p>
+                    <div class="mb-3">
+                        {% if fournisseur.statut == 'actif' %}
+                            <span class="badge bg-success">Actif</span>
+                        {% elif fournisseur.statut == 'blackliste' %}
+                            <span class="badge bg-danger">Blacklisté</span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">{{ fournisseur.get_statut_display }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="d-flex justify-content-center text-warning mb-2">
+                        {% for i in "12345" %}
+                            {% if fournisseur.note_qualite >= forloop.counter %}
+                                <i class="fas fa-star"></i>
+                            {% else %}
+                                <i class="far fa-star"></i>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                    <hr>
+                    <div class="text-start">
+                        <p><strong><i class="fas fa-phone me-2"></i></strong> {{ fournisseur.telephone }}</p>
+                        <p><strong><i class="fas fa-envelope me-2"></i></strong> {{ fournisseur.email }}</p>
+                        <p><strong><i class="fas fa-map-marker-alt me-2"></i></strong> {{ fournisseur.wilaya.nom }}, {{ fournisseur.commune }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <ul class="nav nav-tabs card-header-tabs" id="myTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="info-tab" data-bs-toggle="tab" data-bs-target="#info" type="button">Informations</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="docs-tab" data-bs-toggle="tab" data-bs-target="#docs" type="button">Documents</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="orders-tab" data-bs-toggle="tab" data-bs-target="#orders" type="button">Commandes</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="invoices-tab" data-bs-toggle="tab" data-bs-target="#invoices" type="button">Factures</button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content" id="myTabContent">
+                        <!-- Info Tab -->
+                        <div class="tab-pane fade show active" id="info" role="tabpanel">
+                            <h5 class="mb-3">Informations Légales</h5>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="small text-muted">Registre de Commerce</label>
+                                    <p class="font-weight-bold">********</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="small text-muted">NIF</label>
+                                    <p class="font-weight-bold">********</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="small text-muted">NIS</label>
+                                    <p class="font-weight-bold">{{ fournisseur.nis }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="small text-muted">Article d'Imposition</label>
+                                    <p class="font-weight-bold">{{ fournisseur.article_imposition }}</p>
+                                </div>
+                            </div>
+                            <h5 class="mt-4 mb-3">Domaines d'Activité</h5>
+                            <div class="mb-3">
+                                {% for d in fournisseur.domaines.all %}
+                                    <span class="badge bg-outline-primary text-primary border border-primary me-1">{{ d.nom }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <!-- Docs Tab -->
+                        <div class="tab-pane fade" id="docs" role="tabpanel">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Type</th>
+                                        <th>Expiration</th>
+                                        <th>Fichier</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for doc in fournisseur.documents.all %}
+                                    <tr>
+                                        <td>{{ doc.get_type_doc_display }}</td>
+                                        <td>{{ doc.date_expiration|default:"-" }}</td>
+                                        <td><a href="{{ doc.fichier.url }}" target="_blank"><i class="fas fa-file-download"></i></a></td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr><td colspan="3" class="text-center">Aucun document.</td></tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Orders Tab -->
+                        <div class="tab-pane fade" id="orders" role="tabpanel">
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Référence</th>
+                                            <th>Date</th>
+                                            <th>Projet</th>
+                                            <th>Montant TTC</th>
+                                            <th>Statut</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for bc in fournisseur.boncommande_set.all %}
+                                        <tr>
+                                            <td>{{ bc.reference }}</td>
+                                            <td>{{ bc.date_commande|date:"d/m/Y" }}</td>
+                                            <td>{{ bc.projet.reference }}</td>
+                                            <td>{{ bc.montant_ttc_dzd|floatformat:2 }}</td>
+                                            <td><span class="badge bg-info">{{ bc.get_statut_display }}</span></td>
+                                        </tr>
+                                        {% empty %}
+                                        <tr><td colspan="5" class="text-center">Aucune commande passée.</td></tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Invoices Tab -->
+                        <div class="tab-pane fade" id="invoices" role="tabpanel">
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Référence</th>
+                                            <th>Date</th>
+                                            <th>Montant TTC</th>
+                                            <th>Solde</th>
+                                            <th>Statut</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for f in fournisseur.facturefournisseur_set.all %}
+                                        <tr>
+                                            <td>{{ f.reference }}</td>
+                                            <td>{{ f.date_facture|date:"d/m/Y" }}</td>
+                                            <td>{{ f.montant_ttc_dzd|floatformat:2 }}</td>
+                                            <td>{{ f.solde_dzd|floatformat:2 }}</td>
+                                            <td><span class="badge bg-secondary">{{ f.get_statut_display }}</span></td>
+                                        </tr>
+                                        {% empty %}
+                                        <tr><td colspan="5" class="text-center">Aucune facture enregistrée.</td></tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

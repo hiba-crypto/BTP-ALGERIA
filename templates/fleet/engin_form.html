@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}{% if form.instance.pk %}Modifier{% else %}Nouveau{% endif %} Engin - BTP Algeria{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow mb-4 glass-card">
+                <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-tractor me-2"></i>Détails de l'Engin / Matériel
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.designation|as_crispy_field }}
+                            </div>
+                            <div class="col-md-3">
+                                {{ form.type_engin|as_crispy_field }}
+                            </div>
+                            <div class="col-md-3">
+                                {{ form.etat|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                {{ form.marque|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.modele|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.numero_serie|as_crispy_field }}
+                            </div>
+                        </div>
+
+                        {% if not form.instance.pk %}
+                        <div class="row">
+                            <div class="col-md-4">
+                                {{ form.annee_fabrication|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.annee_mise_en_service|as_crispy_field }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form.immatriculation|as_crispy_field }}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.valeur_achat_dzd|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.taux_amortissement_annuel|as_crispy_field }}
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                {{ form.compteur_heures|as_crispy_field }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.compteur_km|as_crispy_field }}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a href="{% url 'engin_list' %}" class="btn btn-secondary">Annuler</a>
+                            <button type="submit" class="btn btn-primary">Enregistrer l'Engin</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
