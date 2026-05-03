@@ -40,7 +40,7 @@ class LoginView(AuthLoginView):
             ip_address=self.request.META.get('REMOTE_ADDR'),
             user_agent=self.request.META.get('HTTP_USER_AGENT', '')[:255],
             action='LOGIN_SUCCESS',
-            module='accounts',
+            module='admin',
             status='success'
         )
 
@@ -67,7 +67,7 @@ class LoginView(AuthLoginView):
             username_snapshot=username,
             ip_address=self.request.META.get('REMOTE_ADDR'),
             action='LOGIN_FAIL',
-            module='accounts',
+            module='admin',
             status='failed'
         )
         return super().form_invalid(form)
@@ -81,7 +81,7 @@ class LogoutView(AuthLogoutView):
                 user=request.user,
                 username_snapshot=request.user.username,
                 action='LOGOUT',
-                module='accounts',
+                module='admin',
                 status='success'
             )
         return super().dispatch(request, *args, **kwargs)
@@ -175,7 +175,9 @@ class UserManagementView(AdminRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         search_query = self.request.GET.get('q', '')
-        users = User.objects.select_related('profile__role').all()
+        role_filter = self.request.GET.get('role', '')
+        
+        users = User.objects.select_related('profile__role').all().order_by('username')
         
         if search_query:
             users = users.filter(
@@ -183,11 +185,16 @@ class UserManagementView(AdminRequiredMixin, TemplateView):
                 Q(email__icontains=search_query) |
                 Q(first_name__icontains=search_query) |
                 Q(last_name__icontains=search_query)
-            )
+            ).distinct()
+            
+        if role_filter:
+            users = users.filter(profile__role_id=role_filter)
         
-        context['users'] = users
+        context['users'] = users.order_by('username')
+        context['roles'] = Role.objects.all()
         context['form'] = UserCreateForm()
         context['search_query'] = search_query
+        context['role_filter'] = int(role_filter) if role_filter and role_filter.isdigit() else ''
         return context
 
     def post(self, request, *args, **kwargs):

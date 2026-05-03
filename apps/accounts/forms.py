@@ -77,6 +77,11 @@ class UserUpdateForm(forms.ModelForm):
         widget=forms.Select(attrs={'class': 'form-select'}),
         label="Rôle"
     )
+    two_fa_enabled = forms.BooleanField(
+        required=False, 
+        label="Double Authentification (2FA) Activée", 
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
 
     class Meta:
         model = User
@@ -91,8 +96,10 @@ class UserUpdateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if self.instance and hasattr(self.instance, 'profile') and self.instance.profile.role:
-            self.fields['role'].initial = self.instance.profile.role
+        if self.instance and hasattr(self.instance, 'profile'):
+            if self.instance.profile.role:
+                self.fields['role'].initial = self.instance.profile.role
+            self.fields['two_fa_enabled'].initial = self.instance.profile.two_fa_enabled
 
     def save(self, commit=True):
         user = super().save(commit=commit)
@@ -100,8 +107,16 @@ class UserUpdateForm(forms.ModelForm):
             from .models import UserProfile
             from django.contrib.auth.models import Group
             profile, created = UserProfile.objects.get_or_create(user=user)
+            
+            # Sync Role
             role = self.cleaned_data['role']
             profile.role = role
+            
+            # Sync 2FA Status
+            profile.two_fa_enabled = self.cleaned_data['two_fa_enabled']
+            if not profile.two_fa_enabled:
+                profile.two_fa_secret = None # Reset secret if disabled
+            
             profile.save()
             
             # Sync with Groups for legacy support

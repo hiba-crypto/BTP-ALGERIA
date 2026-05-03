@@ -13,11 +13,12 @@ class AuditLogListView(LoginRequiredMixin, ListView):
     paginate_by = 50
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = super().get_queryset().select_related('user__profile__role')
         
         # Filtres
         action = self.request.GET.get('action')
         module = self.request.GET.get('module')
+        role = self.request.GET.get('role')
         date_from = self.request.GET.get('date_from')
         date_to = self.request.GET.get('date_to')
         user_id = self.request.GET.get('user')
@@ -26,6 +27,8 @@ class AuditLogListView(LoginRequiredMixin, ListView):
             queryset = queryset.filter(action=action)
         if module:
             queryset = queryset.filter(module=module)
+        if role:
+            queryset = queryset.filter(user__profile__role__nom=role)
         if date_from:
             queryset = queryset.filter(timestamp__date__gte=date_from)
         if date_to:
@@ -34,6 +37,12 @@ class AuditLogListView(LoginRequiredMixin, ListView):
             queryset = queryset.filter(user_id=user_id)
             
         return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        from apps.accounts.models import Role
+        context['roles_list'] = Role.objects.all()
+        return context
 
 class SecurityDashboardView(LoginRequiredMixin, TemplateView):
     template_name = 'audit/security_dashboard.html'

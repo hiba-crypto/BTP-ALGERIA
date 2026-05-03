@@ -39,10 +39,18 @@
                     <div class="mb-3">
                         {{ form.role|as_crispy_field }}
                     </div>
-                    <div class="mb-3">
-                        <div class="form-check form-switch">
-                            {{ form.is_active }}
-                            <label class="form-check-label" for="{{ form.is_active.id_for_label }}">Compte actif</label>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch p-3 bg-light rounded border">
+                                {{ form.is_active }}
+                                <label class="form-check-label fw-bold ms-2" for="{{ form.is_active.id_for_label }}">Compte actif</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="form-check form-switch p-3 bg-light rounded border">
+                                {{ form.two_fa_enabled }}
+                                <label class="form-check-label fw-bold ms-2" for="{{ form.two_fa_enabled.id_for_label }}">Sécurité 2FA Activée</label>
+                            </div>
                         </div>
                     </div>
                     <div class="d-grid gap-2">

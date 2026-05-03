@@ -23,7 +23,7 @@
                 <label class="form-label small text-muted">Date fin</label>
                 <input type="date" name="date_to" class="form-control form-control-sm" value="{{ request.GET.date_to }}">
             </div>
-            <div class="col-md-3">
+            <div class="col-md-2">
                 <label class="form-label small text-muted">Action</label>
                 <select name="action" class="form-select form-select-sm">
                     <option value="">Toutes les actions</option>
@@ -32,21 +32,29 @@
                     <option value="CREATE" {% if request.GET.action == 'CREATE' %}selected{% endif %}>Création</option>
                     <option value="UPDATE" {% if request.GET.action == 'UPDATE' %}selected{% endif %}>Modification</option>
                     <option value="DELETE" {% if request.GET.action == 'DELETE' %}selected{% endif %}>Suppression</option>
-                    <option value="EXPORT" {% if request.GET.action == 'EXPORT' %}selected{% endif %}>Exportation</option>
                 </select>
             </div>
-            <div class="col-md-3">
-                <label class="form-label small text-muted">Module</label>
+            <div class="col-md-2">
+                <label class="form-label small text-muted">Filtrer par Rôle</label>
+                <select name="role" class="form-select form-select-sm">
+                    <option value="">Tous les rôles</option>
+                    {% for r in roles_list %}
+                        <option value="{{ r.nom }}" {% if request.GET.role == r.nom %}selected{% endif %}>{{ r.nom|upper }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label small text-muted">Module Historique</label>
                 <select name="module" class="form-select form-select-sm">
                     <option value="">Tous les modules</option>
-                    <option value="accounts" {% if request.GET.module == 'accounts' %}selected{% endif %}>Comptes/Auth</option>
-                    <option value="employees" {% if request.GET.module == 'employees' %}selected{% endif %}>Employés/RH</option>
-                    <option value="finance" {% if request.GET.module == 'finance' %}selected{% endif %}>Finance</option>
-                    <option value="projects" {% if request.GET.module == 'projects' %}selected{% endif %}>Projets</option>
+                    <option value="admin" {% if request.GET.module == 'admin' %}selected{% endif %}>Administration</option>
+                    <option value="rh" {% if request.GET.module == 'rh' %}selected{% endif %}>RH</option>
+                    <option value="comptable" {% if request.GET.module == 'comptable' %}selected{% endif %}>Comptabilité</option>
+                    <option value="chef_projet" {% if request.GET.module == 'chef_projet' %}selected{% endif %}>Opérations</option>
                 </select>
             </div>
             <div class="col-md-2 d-flex align-items-end">
-                <button type="submit" class="btn btn-primary btn-sm w-100"><i class="fas fa-filter me-1"></i> Filtrer</button>
+                <button type="submit" class="btn btn-primary btn-sm w-100"><i class="fas fa-filter me-1"></i> Appliquer</button>
             </div>
         </form>
     </div>
